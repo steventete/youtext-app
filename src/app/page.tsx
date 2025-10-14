@@ -10,6 +10,7 @@ import Button from "../components/Button";
 import TranscriptBox, { TranscriptLine } from "../components/TranscriptBox";
 import Loader from "../components/Loader";
 import { toTimestampedTxt } from "../lib/transcriptUtils";
+import Copyright from "@/components/Copyright";
 
 export interface SupadataLine {
   lang: string;
@@ -104,6 +105,7 @@ const handleExtract = async () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <Container>
+        <Copyright />
         <Header />
 
         {/* Input */}
