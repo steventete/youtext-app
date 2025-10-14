@@ -11,6 +11,20 @@ import TranscriptBox, { TranscriptLine } from "../components/TranscriptBox";
 import Loader from "../components/Loader";
 import { toTimestampedTxt } from "../lib/transcriptUtils";
 
+export interface SupadataLine {
+  lang: string;
+  text: string;
+  offset: number;
+  duration: number;
+}
+
+export interface SupadataResponse {
+  lang: string;
+  availableLangs: string[];
+  content: SupadataLine[];
+}
+
+
 function App() {
   const [url, setUrl] = useState("");
   const [transcript, setTranscript] = useState<TranscriptLine[] | null>(null);
@@ -33,7 +47,7 @@ const handleExtract = async () => {
 
     if (res.ok && Array.isArray(data.content)) {
       setTranscript(
-        data.content.map((item: any) => ({
+        data.content.map((item: SupadataLine) => ({
           text: item.text,
           offset: item.offset,
           duration: item.duration,
