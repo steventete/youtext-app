@@ -1,103 +1,165 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useState } from "react";
+import { Youtube, Download, Copy, Sparkles } from "lucide-react";
+import Header from "../components/Header";
+import Container from "../components/Container";
+import Card from "../components/Card";
+import Input from "../components/Input";
+import Button from "../components/Button";
+import TranscriptBox, { TranscriptLine } from "../components/TranscriptBox";
+import Loader from "../components/Loader";
+import { toTimestampedTxt } from "../lib/transcriptUtils";
+
+function App() {
+  const [url, setUrl] = useState("");
+  const [transcript, setTranscript] = useState<TranscriptLine[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+const handleExtract = async () => {
+  if (!url) return;
+  setLoading(true);
+  setTranscript(null);
+
+  try {
+    const res = await fetch('/api/transcript', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok && Array.isArray(data.content)) {
+      setTranscript(
+        data.content.map((item: any) => ({
+          text: item.text,
+          offset: item.offset,
+          duration: item.duration,
+        }))
+      );
+    } else {
+      setTranscript([
+        {
+          text: data.error || 'Could not fetch transcript.',
+          offset: 0,
+          duration: 0,
+        },
+      ]);
+    }
+  } catch (err) {
+    console.error(err);
+    setTranscript([
+      {
+        text: 'An unexpected error occurred.',
+        offset: 0,
+        duration: 0,
+      },
+    ]);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  const handleCopy = async () => {
+    if (!transcript || transcript.length === 0) return;
+    const plain = toTimestampedTxt(transcript);
+    try {
+      await navigator.clipboard.writeText(plain);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {
+      console.warn("Clipboard copy failed", e);
+    }
+  };
+
+  const handleDownload = () => {
+    if (!transcript || transcript.length === 0) return;
+    const txt = toTimestampedTxt(transcript);
+    const blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "transcript.txt";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <Container>
+        <Header />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+        {/* Input */}
+        <Card className="animate-fade-in">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Youtube className="w-5 h-5 text-accent animate-pulse" />
+              <h2 className="text-lg font-semibold">Video URL</h2>
+            </div>
+
+            <Input
+              label="YouTube Video Link"
+              placeholder="https://youtube.com/watch?v=..."
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+            <Button
+              onClick={handleExtract}
+              disabled={!url || loading}
+              className="group"
+            >
+              <span className="flex items-center justify-center gap-2">
+                <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                {loading ? "Extracting..." : "Extract Transcript"}
+              </span>
+            </Button>
+          </div>
+        </Card>
+
+        {/* Loading */}
+        {loading && (
+          <Card className="animate-fade-in">
+            <Loader />
+          </Card>
+        )}
+
+        {/* Transcript */}
+        {transcript && !loading && (
+          <Card className="animate-slide-up">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Transcript</h2>
+                <div className="flex gap-2">
+                  <Button
+                    variant="inset"
+                    onClick={handleCopy}
+                    className="!px-3 !py-2"
+                  >
+                    <Copy
+                      className={`w-4 h-4 ${copied ? "text-accent" : ""}`}
+                    />
+                  </Button>
+                  <Button
+                    variant="inset"
+                    onClick={handleDownload}
+                    className="!px-3 !py-2"
+                  >
+                    <Download className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <TranscriptBox text={transcript} />
+            </div>
+          </Card>
+        )}
+      </Container>
     </div>
   );
 }
+
+export default App;

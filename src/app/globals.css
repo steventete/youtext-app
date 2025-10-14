@@ -1,26 +1,109 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* YouTube Red Accent */
+  --color-accent: #FF0000;
+  --color-accent-hover: #CC0000;
+  --color-accent-light: rgba(255, 0, 0, 0.1);
+  
+  /* Neumorphic Base Colors */
+  --color-base: #e0e5ec;
+  --color-light-shadow: #ffffff;
+  --color-dark-shadow: #a3b1c6;
+  --color-text: #2c3e50;
+  --color-text-secondary: #5a6c7d;
+  
+  /* Shadows */
+  --shadow-neumorphic: 8px 8px 16px var(--color-dark-shadow), -8px -8px 16px var(--color-light-shadow);
+  --shadow-inset: inset 4px 4px 8px var(--color-dark-shadow), inset -4px -4px 8px var(--color-light-shadow);
+  --shadow-hover: 12px 12px 24px var(--color-dark-shadow), -12px -12px 24px var(--color-light-shadow);
+  
+  /* Radius */
+  --radius-xl: 20px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background: linear-gradient(135deg, #e0e5ec 0%, #d4dae6 100%);
+    min-height: 100vh;
+    color: var(--color-text);
+    font-family: system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .bg-base {
+    background-color: var(--color-base);
+  }
+  
+  .text-accent {
+    color: var(--color-accent);
+  }
+  
+  .bg-accent {
+    background-color: var(--color-accent);
+  }
+  
+  .shadow-neumorphic {
+    box-shadow: var(--shadow-neumorphic);
+  }
+  
+  .shadow-inset {
+    box-shadow: var(--shadow-inset);
+  }
+  
+  .shadow-hover {
+    box-shadow: var(--shadow-hover);
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--color-base);
+    border-radius: 10px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
+    border-radius: 10px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent-hover);
+  }
+  
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slide-up 0.5s ease-out;
+  }
 }
