@@ -12,6 +12,14 @@ export async function POST(req: Request) {
     }
 
     const apiKey = process.env.SUPADATA_KEY;
+
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "Missing SUPADATA_KEY in environment." },
+        { status: 500 },
+      );
+    }
+
     const apiUrl = `https://api.supadata.ai/v1/transcript?url=${encodeURIComponent(
       url,
     )}`;
