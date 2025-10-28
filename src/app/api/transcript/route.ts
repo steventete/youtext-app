@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     if (!apiKey) {
       return NextResponse.json(
-        { error: "Missing SUPADATA_KEY in environment." },
+        { error: "There is a problem with the API." },
         { status: 500 },
       );
     }
