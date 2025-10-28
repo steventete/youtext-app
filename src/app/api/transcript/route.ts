@@ -7,13 +7,13 @@ export async function POST(req: Request) {
     if (!url) {
       return NextResponse.json(
         { error: "Missing YouTube URL." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const apiKey = "sd_4180b6ee6ed9d30ff2b5ae99f1f57e0e";
+    const apiKey = process.env.SUPADATA_KEY;
     const apiUrl = `https://api.supadata.ai/v1/transcript?url=${encodeURIComponent(
-      url
+      url,
     )}`;
 
     const res = await fetch(apiUrl, {
@@ -26,19 +26,17 @@ export async function POST(req: Request) {
       console.error("Supadata API error:", errorText);
       return NextResponse.json(
         { error: `Supadata API error: ${res.statusText}` },
-        { status: res.status }
+        { status: res.status },
       );
     }
 
     const data = await res.json();
-
-    console.log("Fetched transcript:", data);
     return NextResponse.json(data);
   } catch (err) {
     console.error("Server error:", err);
     return NextResponse.json(
       { error: "Internal Server Error." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
