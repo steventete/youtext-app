@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Youtube, Download, Copy, Sparkles } from "lucide-react";
+import { Youtube, Copy, Sparkles } from "lucide-react";
 import Header from "../components/Header";
 import Container from "../components/Container";
 import Card from "../components/Card";
@@ -162,7 +162,7 @@ function App() {
                     onClick={handleDownload}
                     className="!px-3 !py-2"
                   >
-                    <Download className="w-4 h-4" /> TXT
+                    TXT
                   </Button>
 
                   <Button
@@ -170,7 +170,7 @@ function App() {
                     onClick={handleDownloadSrt}
                     className="!px-3 !py-2"
                   >
-                    <Download className="w-4 h-4" /> SRT
+                    SRT
                   </Button>
                 </div>
               </div>
